@@ -1,17 +1,29 @@
+const axios = require("axios");
+
 const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Hello from Microservice A");
+  res.send("Hello from Microservice A  ");
 });
 
 app.get("/call-b", async (req, res) => {
   try {
-    const response = await fetch("http://192.168.1.102:6000");
-    const data = await response.text();
-    res.send(`Response from Microservice B: ${data}`);
+    const { data } = await axios.get("http://192.168.0.146:6000");
+
+    res.send({
+      success: true,
+      message: "Successfully received response from Microservice B",
+      data,
+    });
   } catch (error) {
-    res.status(500).send("Error connecting to Microservice B");
+    console.error("Error calling Microservice B:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to connect to Microservice B",
+      error: error.message,
+    });
   }
 });
 
